@@ -565,7 +565,7 @@ library SafeERC20 {
 }
 
 
-// File contracts/distribution/PushGenesisRewardPool.sol
+// File contracts/distribution/PShareRewardPool.sol
 
 
 
@@ -573,9 +573,9 @@ pragma solidity 0.6.12;
 
 
 
-// Note that this pool has no minter key of PUSH (rewards).
-// Instead, the governance will call PUSH distributeReward method and send reward to this pool at the beginning.
-contract PushGenesisRewardPool {
+// Note that this pool has no minter key of tSHARE (rewards).
+// Instead, the governance will call tSHARE distributeReward method and send reward to this pool at the beginning.
+contract PShareRewardPool {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -584,20 +584,20 @@ contract PushGenesisRewardPool {
 
     // Info of each user.
     struct UserInfo {
-        uint256 amount; // How many tokens the user has provided.
+        uint256 amount; // How many LP tokens the user has provided.
         uint256 rewardDebt; // Reward debt. See explanation below.
     }
 
     // Info of each pool.
     struct PoolInfo {
         IERC20 token; // Address of LP token contract.
-        uint256 allocPoint; // How many allocation points assigned to this pool. PUSH to distribute.
-        uint256 lastRewardTime; // Last time that PUSH distribution occurs.
-        uint256 accPushPerShare; // Accumulated PUSH per share, times 1e18. See below.
-        bool isStarted; // if lastRewardBlock has passed
+        uint256 allocPoint; // How many allocation points assigned to this pool. tSHAREs to distribute per block.
+        uint256 lastRewardTime; // Last time that tSHAREs distribution occurs.
+        uint256 accPSharePerShare; // Accumulated tSHAREs per share, times 1e18. See below.
+        bool isStarted; // if lastRewardTime has passed
     }
 
-    IERC20 public push;
+    IERC20 public pshare;
 
     // Info of each pool.
     PoolInfo[] public poolInfo;
@@ -608,26 +608,15 @@ contract PushGenesisRewardPool {
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
 
-    // The time when PUSH mining starts.
+    // The time when tSHARE mining starts.
     uint256 public poolStartTime;
 
-    // The time when PUSH mining ends.
+    // The time when tSHARE mining ends.
     uint256 public poolEndTime;
 
-    // TESTNET
-    // uint256 public pushPerSecond = 3.0555555 ether; // 11000 PUSH / (1h * 60min * 60s)
-    // uint256 public runningTime = 24 hours; // 1 hours
-    // uint256 public constant TOTAL_REWARDS = 11000 ether;
-    // END TESTNET
-
-    // MAINNET
-    uint256 public pushPerSecond = 0.11574 ether; // 10000 PUSH / (24h * 60min * 60s)
-    uint256 public runningTime = 1 days; // 1 days
-    uint256 public constant TOTAL_REWARDS = 10000 ether;
-    // END MAINNET
-
-    address public communityFund = 0x83487d1E16fa4860C0BD1D0f5a3D9D6CF8f3A6F0;
-    address public devFund = 0x83487d1E16fa4860C0BD1D0f5a3D9D6CF8f3A6F0;
+    uint256 public tSharePerSecond = 0.00186122 ether; // 59500 pshare / (370 days * 24h * 60min * 60s)
+    uint256 public runningTime = 370 days; // 370 days
+    uint256 public constant TOTAL_REWARDS = 59500 ether;
 
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -635,29 +624,29 @@ contract PushGenesisRewardPool {
     event RewardPaid(address indexed user, uint256 amount);
 
     constructor(
-        address _push,
+        address _pshare,
         uint256 _poolStartTime
     ) public {
         require(block.timestamp < _poolStartTime, "late");
-        if (_push != address(0)) push = IERC20(_push);
+        if (_pshare != address(0)) pshare = IERC20(_pshare);
         poolStartTime = _poolStartTime;
         poolEndTime = poolStartTime + runningTime;
         operator = msg.sender;
     }
 
     modifier onlyOperator() {
-        require(operator == msg.sender, "PushGenesisPool: caller is not the operator");
+        require(operator == msg.sender, "PShareRewardPool: caller is not the operator");
         _;
     }
 
     function checkPoolDuplicate(IERC20 _token) internal view {
         uint256 length = poolInfo.length;
         for (uint256 pid = 0; pid < length; ++pid) {
-            require(poolInfo[pid].token != _token, "PushGenesisPool: existing pool?");
+            require(poolInfo[pid].token != _token, "PShareRewardPool: existing pool?");
         }
     }
 
-    // Add a new token to the pool. Can only be called by the owner.
+    // Add a new lp to the pool. Can only be called by the owner.
     function add(
         uint256 _allocPoint,
         IERC20 _token,
@@ -683,19 +672,29 @@ contract PushGenesisRewardPool {
                 _lastRewardTime = block.timestamp;
             }
         }
-        bool _isStarted = (_lastRewardTime <= poolStartTime) || (_lastRewardTime <= block.timestamp);
-        poolInfo.push(PoolInfo({token: _token, allocPoint: _allocPoint, lastRewardTime: _lastRewardTime, accPushPerShare: 0, isStarted: _isStarted}));
+        bool _isStarted =
+        (_lastRewardTime <= poolStartTime) ||
+        (_lastRewardTime <= block.timestamp);
+        poolInfo.push(PoolInfo({
+            token : _token,
+            allocPoint : _allocPoint,
+            lastRewardTime : _lastRewardTime,
+            accPSharePerShare : 0,
+            isStarted : _isStarted
+            }));
         if (_isStarted) {
             totalAllocPoint = totalAllocPoint.add(_allocPoint);
         }
     }
 
-    // Update the given pool's PUSH allocation point. Can only be called by the owner.
+    // Update the given pool's tSHARE allocation point. Can only be called by the owner.
     function set(uint256 _pid, uint256 _allocPoint) public onlyOperator {
         massUpdatePools();
         PoolInfo storage pool = poolInfo[_pid];
         if (pool.isStarted) {
-            totalAllocPoint = totalAllocPoint.sub(pool.allocPoint).add(_allocPoint);
+            totalAllocPoint = totalAllocPoint.sub(pool.allocPoint).add(
+                _allocPoint
+            );
         }
         pool.allocPoint = _allocPoint;
     }
@@ -705,27 +704,27 @@ contract PushGenesisRewardPool {
         if (_fromTime >= _toTime) return 0;
         if (_toTime >= poolEndTime) {
             if (_fromTime >= poolEndTime) return 0;
-            if (_fromTime <= poolStartTime) return poolEndTime.sub(poolStartTime).mul(pushPerSecond);
-            return poolEndTime.sub(_fromTime).mul(pushPerSecond);
+            if (_fromTime <= poolStartTime) return poolEndTime.sub(poolStartTime).mul(tSharePerSecond);
+            return poolEndTime.sub(_fromTime).mul(tSharePerSecond);
         } else {
             if (_toTime <= poolStartTime) return 0;
-            if (_fromTime <= poolStartTime) return _toTime.sub(poolStartTime).mul(pushPerSecond);
-            return _toTime.sub(_fromTime).mul(pushPerSecond);
+            if (_fromTime <= poolStartTime) return _toTime.sub(poolStartTime).mul(tSharePerSecond);
+            return _toTime.sub(_fromTime).mul(tSharePerSecond);
         }
     }
 
-    // View function to see pending PUSH on frontend.
-    function pendingPUSH(uint256 _pid, address _user) external view returns (uint256) {
+    // View function to see pending tSHAREs on frontend.
+    function pendingShare(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
-        uint256 accPushPerShare = pool.accPushPerShare;
+        uint256 accPSharePerShare = pool.accPSharePerShare;
         uint256 tokenSupply = pool.token.balanceOf(address(this));
         if (block.timestamp > pool.lastRewardTime && tokenSupply != 0) {
             uint256 _generatedReward = getGeneratedReward(pool.lastRewardTime, block.timestamp);
-            uint256 _pushReward = _generatedReward.mul(pool.allocPoint).div(totalAllocPoint);
-            accPushPerShare = accPushPerShare.add(_pushReward.mul(1e18).div(tokenSupply));
+            uint256 _pshareReward = _generatedReward.mul(pool.allocPoint).div(totalAllocPoint);
+            accPSharePerShare = accPSharePerShare.add(_pshareReward.mul(1e18).div(tokenSupply));
         }
-        return user.amount.mul(accPushPerShare).div(1e18).sub(user.rewardDebt);
+        return user.amount.mul(accPSharePerShare).div(1e18).sub(user.rewardDebt);
     }
 
     // Update reward variables for all pools. Be careful of gas spending!
@@ -753,8 +752,8 @@ contract PushGenesisRewardPool {
         }
         if (totalAllocPoint > 0) {
             uint256 _generatedReward = getGeneratedReward(pool.lastRewardTime, block.timestamp);
-            uint256 _pushReward = _generatedReward.mul(pool.allocPoint).div(totalAllocPoint);
-            pool.accPushPerShare = pool.accPushPerShare.add(_pushReward.mul(1e18).div(tokenSupply));
+            uint256 _pshareReward = _generatedReward.mul(pool.allocPoint).div(totalAllocPoint);
+            pool.accPSharePerShare = pool.accPSharePerShare.add(_pshareReward.mul(1e18).div(tokenSupply));
         }
         pool.lastRewardTime = block.timestamp;
     }
@@ -766,20 +765,17 @@ contract PushGenesisRewardPool {
         UserInfo storage user = userInfo[_pid][_sender];
         updatePool(_pid);
         if (user.amount > 0) {
-            uint256 _pending = user.amount.mul(pool.accPushPerShare).div(1e18).sub(user.rewardDebt);
+            uint256 _pending = user.amount.mul(pool.accPSharePerShare).div(1e18).sub(user.rewardDebt);
             if (_pending > 0) {
-                safePushTransfer(_sender, _pending);
+                safePShareTransfer(_sender, _pending);
                 emit RewardPaid(_sender, _pending);
             }
         }
         if (_amount > 0) {
             pool.token.safeTransferFrom(_sender, address(this), _amount);
-            uint256 feeAmount = _amount.mul(100).div(10000);
-            pool.token.safeTransfer(communityFund, feeAmount.div(2));
-            pool.token.safeTransfer(devFund, feeAmount.div(2));
-            user.amount = user.amount.add(_amount.mul(9900).div(10000));
+            user.amount = user.amount.add(_amount);
         }
-        user.rewardDebt = user.amount.mul(pool.accPushPerShare).div(1e18);
+        user.rewardDebt = user.amount.mul(pool.accPSharePerShare).div(1e18);
         emit Deposit(_sender, _pid, _amount);
     }
 
@@ -790,16 +786,16 @@ contract PushGenesisRewardPool {
         UserInfo storage user = userInfo[_pid][_sender];
         require(user.amount >= _amount, "withdraw: not good");
         updatePool(_pid);
-        uint256 _pending = user.amount.mul(pool.accPushPerShare).div(1e18).sub(user.rewardDebt);
+        uint256 _pending = user.amount.mul(pool.accPSharePerShare).div(1e18).sub(user.rewardDebt);
         if (_pending > 0) {
-            safePushTransfer(_sender, _pending);
+            safePShareTransfer(_sender, _pending);
             emit RewardPaid(_sender, _pending);
         }
         if (_amount > 0) {
             user.amount = user.amount.sub(_amount);
             pool.token.safeTransfer(_sender, _amount);
         }
-        user.rewardDebt = user.amount.mul(pool.accPushPerShare).div(1e18);
+        user.rewardDebt = user.amount.mul(pool.accPSharePerShare).div(1e18);
         emit Withdraw(_sender, _pid, _amount);
     }
 
@@ -814,14 +810,14 @@ contract PushGenesisRewardPool {
         emit EmergencyWithdraw(msg.sender, _pid, _amount);
     }
 
-    // Safe PUSH transfer function, just in case if rounding error causes pool to not have enough PUSHs.
-    function safePushTransfer(address _to, uint256 _amount) internal {
-        uint256 _pushBalance = push.balanceOf(address(this));
-        if (_pushBalance > 0) {
-            if (_amount > _pushBalance) {
-                push.safeTransfer(_to, _pushBalance);
+    // Safe pshare transfer function, just in case if rounding error causes pool to not have enough tSHAREs.
+    function safePShareTransfer(address _to, uint256 _amount) internal {
+        uint256 _pshareBal = pshare.balanceOf(address(this));
+        if (_pshareBal > 0) {
+            if (_amount > _pshareBal) {
+                pshare.safeTransfer(_to, _pshareBal);
             } else {
-                push.safeTransfer(_to, _amount);
+                pshare.safeTransfer(_to, _amount);
             }
         }
     }
@@ -830,14 +826,10 @@ contract PushGenesisRewardPool {
         operator = _operator;
     }
 
-    function governanceRecoverUnsupported(
-        IERC20 _token,
-        uint256 amount,
-        address to
-    ) external onlyOperator {
+    function governanceRecoverUnsupported(IERC20 _token, uint256 amount, address to) external onlyOperator {
         if (block.timestamp < poolEndTime + 90 days) {
-            // do not allow to drain core token (PUSH or lps) if less than 90 days after pool ends
-            require(_token != push, "push");
+            // do not allow to drain core token (tSHARE or lps) if less than 90 days after pool ends
+            require(_token != pshare, "pshare");
             uint256 length = poolInfo.length;
             for (uint256 pid = 0; pid < length; ++pid) {
                 PoolInfo storage pool = poolInfo[pid];
