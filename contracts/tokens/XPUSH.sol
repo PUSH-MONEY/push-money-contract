@@ -1,18 +1,4 @@
 // SPDX-License-Identifier: MIT
-/*
-
-$$$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$\                                                            
-$$  __$$\ $$  __$$\ $$$\    $$$ |$$  __$$\                                                           
-$$ |  $$ |$$ /  $$ |$$$$\  $$$$ |$$ |  $$ |    $$$$$$\$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$\   $$\ 
-$$$$$$$\ |$$ |  $$ |$$\$$\$$ $$ |$$$$$$$\ |    $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$ |  $$ |
-$$  __$$\ $$ |  $$ |$$ \$$$  $$ |$$  __$$\     $$ / $$ / $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |
-$$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |  $$ |    $$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |
-$$$$$$$  | $$$$$$  |$$ | \_/ $$ |$$$$$$$  |$$\ $$ | $$ | $$ |\$$$$$$  |$$ |  $$ |\$$$$$$$\ \$$$$$$$ |
-\_______/  \______/ \__|     \__|\_______/ \__|\__| \__| \__| \______/ \__|  \__| \_______| \____$$ |
-                                                                                           $$\   $$ |
-                                                                                           \$$$$$$  |
-    http://bomb.money                                                                      \______/ 
-*/
 
 pragma solidity >=0.6.0 <0.8.0;
 
@@ -653,7 +639,7 @@ pragma solidity 0.6.12;
 // XPUSH is the coolest bar in town. You come in with some Reward, and leave with more! The longer you stay, the more Reward you get.
 //
 // This contract handles swapping to and from xReward, AMMSwap's staking token.
-contract XPUSH is ERC20("Governance Pushing", "xPUSH"){
+contract XPUSH is ERC20("Governance PUSH", "xPUSH"){
     using SafeMath for uint256;
     IERC20 public reward;
 

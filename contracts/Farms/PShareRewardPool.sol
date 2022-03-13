@@ -573,8 +573,8 @@ pragma solidity 0.6.12;
 
 
 
-// Note that this pool has no minter key of tSHARE (rewards).
-// Instead, the governance will call tSHARE distributeReward method and send reward to this pool at the beginning.
+// Note that this pool has no minter key of pSHARE (rewards).
+// Instead, the governance will call pSHARE distributeReward method and send reward to this pool at the beginning.
 contract PShareRewardPool {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -591,9 +591,9 @@ contract PShareRewardPool {
     // Info of each pool.
     struct PoolInfo {
         IERC20 token; // Address of LP token contract.
-        uint256 allocPoint; // How many allocation points assigned to this pool. tSHAREs to distribute per block.
-        uint256 lastRewardTime; // Last time that tSHAREs distribution occurs.
-        uint256 accPSharePerShare; // Accumulated tSHAREs per share, times 1e18. See below.
+        uint256 allocPoint; // How many allocation points assigned to this pool. pSHAREs to distribute per block.
+        uint256 lastRewardTime; // Last time that pSHAREs distribution occurs.
+        uint256 accPSharePerShare; // Accumulated pSHAREs per share, times 1e18. See below.
         bool isStarted; // if lastRewardTime has passed
     }
 
@@ -608,13 +608,13 @@ contract PShareRewardPool {
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
 
-    // The time when tSHARE mining starts.
+    // The time when pSHARE mining starts.
     uint256 public poolStartTime;
 
-    // The time when tSHARE mining ends.
+    // The time when pSHARE mining ends.
     uint256 public poolEndTime;
 
-    uint256 public tSharePerSecond = 0.00186122 ether; // 59500 pshare / (370 days * 24h * 60min * 60s)
+    uint256 public pSharePerSecond = 0.00186122 ether; // 59500 pshare / (370 days * 24h * 60min * 60s)
     uint256 public runningTime = 370 days; // 370 days
     uint256 public constant TOTAL_REWARDS = 59500 ether;
 
@@ -687,7 +687,7 @@ contract PShareRewardPool {
         }
     }
 
-    // Update the given pool's tSHARE allocation point. Can only be called by the owner.
+    // Update the given pool's pSHARE allocation point. Can only be called by the owner.
     function set(uint256 _pid, uint256 _allocPoint) public onlyOperator {
         massUpdatePools();
         PoolInfo storage pool = poolInfo[_pid];
@@ -704,16 +704,16 @@ contract PShareRewardPool {
         if (_fromTime >= _toTime) return 0;
         if (_toTime >= poolEndTime) {
             if (_fromTime >= poolEndTime) return 0;
-            if (_fromTime <= poolStartTime) return poolEndTime.sub(poolStartTime).mul(tSharePerSecond);
-            return poolEndTime.sub(_fromTime).mul(tSharePerSecond);
+            if (_fromTime <= poolStartTime) return poolEndTime.sub(poolStartTime).mul(pSharePerSecond);
+            return poolEndTime.sub(_fromTime).mul(pSharePerSecond);
         } else {
             if (_toTime <= poolStartTime) return 0;
-            if (_fromTime <= poolStartTime) return _toTime.sub(poolStartTime).mul(tSharePerSecond);
-            return _toTime.sub(_fromTime).mul(tSharePerSecond);
+            if (_fromTime <= poolStartTime) return _toTime.sub(poolStartTime).mul(pSharePerSecond);
+            return _toTime.sub(_fromTime).mul(pSharePerSecond);
         }
     }
 
-    // View function to see pending tSHAREs on frontend.
+    // View function to see pending pSHAREs on frontend.
     function pendingShare(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
@@ -810,7 +810,7 @@ contract PShareRewardPool {
         emit EmergencyWithdraw(msg.sender, _pid, _amount);
     }
 
-    // Safe pshare transfer function, just in case if rounding error causes pool to not have enough tSHAREs.
+    // Safe pshare transfer function, just in case if rounding error causes pool to not have enough pSHAREs.
     function safePShareTransfer(address _to, uint256 _amount) internal {
         uint256 _pshareBal = pshare.balanceOf(address(this));
         if (_pshareBal > 0) {
@@ -828,7 +828,7 @@ contract PShareRewardPool {
 
     function governanceRecoverUnsupported(IERC20 _token, uint256 amount, address to) external onlyOperator {
         if (block.timestamp < poolEndTime + 90 days) {
-            // do not allow to drain core token (tSHARE or lps) if less than 90 days after pool ends
+            // do not allow to drain core token (pSHARE or lps) if less than 90 days after pool ends
             require(_token != pshare, "pshare");
             uint256 length = poolInfo.length;
             for (uint256 pid = 0; pid < length; ++pid) {

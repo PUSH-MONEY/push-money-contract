@@ -808,7 +808,7 @@ pragma solidity 0.6.12;
 contract PShare is ERC20Burnable, Operator {
     using SafeMath for uint256;
 
-    // TOTAL MAX SUPPLY = 70,000 tSHAREs
+    // TOTAL MAX SUPPLY = 70,000 pSHAREs
     uint256 public constant FARMING_POOL_REWARD_ALLOCATION = 59500 ether;
     uint256 public constant COMMUNITY_FUND_POOL_ALLOCATION = 5500 ether;
     uint256 public constant DEV_FUND_POOL_ALLOCATION = 5000 ether;
@@ -828,7 +828,7 @@ contract PShare is ERC20Burnable, Operator {
 
     bool public rewardPoolDistributed = false;
 
-    constructor(uint256 _startTime, address _communityFund, address _devFund) public ERC20("Pushing Share", "PSHARE") {
+    constructor(uint256 _startTime, address _communityFund, address _devFund) public ERC20("PUSH Share", "PSHARE") {
         _mint(msg.sender, 1 ether); // mint 1 PUSH Share for initial pools deployment
 
         startTime = _startTime;
