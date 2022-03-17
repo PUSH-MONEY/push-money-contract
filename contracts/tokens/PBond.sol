@@ -806,7 +806,7 @@ contract PBond is ERC20Burnable, Operator {
     /**
      * @notice Constructs the PUSH Bond ERC-20 contract.
      */
-    constructor() public ERC20("Pushing Bond", "PBOND") {}
+    constructor() public ERC20("PUSH Bond", "PBOND") {}
 
     /**
      * @notice Operator mints basis bonds to a recipient

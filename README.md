@@ -1,7 +1,7 @@
 # Contracts of Push Money
  
 ## Token Contracts
-- Push Tokne (PUSH) : [0x4cbD241e248e0545fc8AcF6338639988751b40e8](https://bscscan.com/address/0x4cbD241e248e0545fc8AcF6338639988751b40e8)
+- Push Token (PUSH) : [0x4cbD241e248e0545fc8AcF6338639988751b40e8](https://bscscan.com/address/0x4cbD241e248e0545fc8AcF6338639988751b40e8)
 - Governance PUSH (xPUSH) : [0xf07f73017103795Ed25f28733B34396E09419ad2](https://bscscan.com/address/0xf07f73017103795Ed25f28733B34396E09419ad2)
 - PUSH Share (PSHARE) : [0xdd7bD82ae6263cA3F9f973f5439f253Fe8CC1343](https://bscscan.com/address/0xdd7bD82ae6263cA3F9f973f5439f253Fe8CC1343)
 - PUSH Bond (PBOND) : [0x667Dfce8b7ddF01921Aa41bb4685aA8424F894b4](https://bscscan.com/address/0x667Dfce8b7ddF01921Aa41bb4685aA8424F894b4)
