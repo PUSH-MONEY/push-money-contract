@@ -810,8 +810,8 @@ contract PShare is ERC20Burnable, Operator {
 
     // TOTAL MAX SUPPLY = 70,000 pSHAREs
     uint256 public constant FARMING_POOL_REWARD_ALLOCATION = 59500 ether;
-    uint256 public constant COMMUNITY_FUND_POOL_ALLOCATION = 5500 ether;
-    uint256 public constant DEV_FUND_POOL_ALLOCATION = 5000 ether;
+    uint256 public constant COMMUNITY_FUND_POOL_ALLOCATION = 7500 ether;
+    uint256 public constant DEV_FUND_POOL_ALLOCATION = 3000 ether;
 
     uint256 public constant VESTING_DURATION = 365 days;
     uint256 public startTime;

@@ -614,20 +614,14 @@ contract PushGenesisRewardPool {
     // The time when PUSH mining ends.
     uint256 public poolEndTime;
 
-    // TESTNET
-    // uint256 public pushPerSecond = 3.0555555 ether; // 11000 PUSH / (1h * 60min * 60s)
-    // uint256 public runningTime = 24 hours; // 1 hours
-    // uint256 public constant TOTAL_REWARDS = 11000 ether;
-    // END TESTNET
-
     // MAINNET
-    uint256 public pushPerSecond = 0.11574 ether; // 10000 PUSH / (24h * 60min * 60s)
-    uint256 public runningTime = 1 days; // 1 days
-    uint256 public constant TOTAL_REWARDS = 10000 ether;
+    uint256 public pushPerSecond = 0.06365 ether; // 11000 PUSH / (24h * 60min * 60s)
+    uint256 public runningTime = 2 days; // 2 days
+    uint256 public constant TOTAL_REWARDS = 11000 ether;
     // END MAINNET
 
-    address public communityFund = 0x83487d1E16fa4860C0BD1D0f5a3D9D6CF8f3A6F0;
-    address public devFund = 0x83487d1E16fa4860C0BD1D0f5a3D9D6CF8f3A6F0;
+    address public communityFund = 0xf2BC0E4353EC91E518aF86C54dBE3E50FAc2D8ed;
+    address public devFund = 0x0C82d47E15869B1D6499661f50077E0F0f8c4A93;
 
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -775,8 +769,8 @@ contract PushGenesisRewardPool {
         if (_amount > 0) {
             pool.token.safeTransferFrom(_sender, address(this), _amount);
             uint256 feeAmount = _amount.mul(100).div(10000);
-            pool.token.safeTransfer(communityFund, feeAmount.div(2));
-            pool.token.safeTransfer(devFund, feeAmount.div(2));
+            pool.token.safeTransfer(communityFund, feeAmount.mul(6).div(10));
+            pool.token.safeTransfer(devFund, feeAmount.mul(4).div(10));
             user.amount = user.amount.add(_amount.mul(9900).div(10000));
         }
         user.rewardDebt = user.amount.mul(pool.accPushPerShare).div(1e18);

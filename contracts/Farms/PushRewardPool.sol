@@ -630,11 +630,11 @@ contract PushRewardPool {
 
         poolStartTime = _poolStartTime;
 
-        epochEndTimes[0] = poolStartTime + 4 days; // Day 2-5
-        epochEndTimes[1] = epochEndTimes[0] + 5 days; // Day 6-10
+        epochEndTimes[0] = poolStartTime + 7 days; // Day 2-8
+        epochEndTimes[1] = epochEndTimes[0] + 7 days; // Day 9-15
 
-        epochPushPerSecond[0] = epochTotalRewards[0].div(4 days);
-        epochPushPerSecond[1] = epochTotalRewards[1].div(5 days);
+        epochPushPerSecond[0] = epochTotalRewards[0].div(7 days);
+        epochPushPerSecond[1] = epochTotalRewards[1].div(7 days);
 
         epochPushPerSecond[2] = 0;
         operator = msg.sender;
