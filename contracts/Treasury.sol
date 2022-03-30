@@ -1440,7 +1440,7 @@ contract Treasury is ContractGuard {
                 uint256 _percentage = previousEpochPushPrice.sub(pushPriceOne);
                 uint256 _savedForBond;
                 uint256 _savedForBoardroom;
-                uint256 _mse = _calculateMaxSupplyExpansionPercent(pushSupply).mul(1e14);
+                uint256 _mse = _calculateMaxSupplyExpansionPercent(pushSupply).mul(1e10);
                 if (_percentage > _mse) {
                     _percentage = _mse;
                 }

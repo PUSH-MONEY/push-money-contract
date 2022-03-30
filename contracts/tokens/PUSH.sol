@@ -1016,12 +1016,14 @@ contract Push is ERC20Burnable, Operator {
     using SafeMath8 for uint8;
     using SafeMath for uint256;
 
-    // Initial distribution for the first 24h genesis pools
+    // Initial distribution for the first 48h genesis pools
     uint256 public constant INITIAL_GENESIS_POOL_DISTRIBUTION = 11000 ether;
-    // Initial distribution for the day 2-5 PUSH-WETH LP -> PUSH pool
+    // Initial distribution for the day 2 weeks PUSH-WETH LP -> PUSH pool
     uint256 public constant INITIAL_PUSH_POOL_DISTRIBUTION = 140000 ether;
     // Distribution for airdrops wallet
-    uint256 public constant INITIAL_AIRDROP_WALLET_DISTRIBUTION = 9000 ether;
+    uint256 public constant INITIAL_AIRDROP_WALLET_DISTRIBUTION = 5000 ether;
+    // Distribution for partnership wallet
+    uint256 public constant INITIAL_PARTNERSHIP_WALLET_DISTRIBUTION = 4000 ether;
 
     // Have the rewards been distributed to the pools
     bool public rewardPoolDistributed = false;
@@ -1253,16 +1255,19 @@ contract Push is ERC20Burnable, Operator {
     function distributeReward(
         address _genesisPool,
         address _pushPool,
-        address _airdropWallet
+        address _airdropWallet,
+        address _partnerWallet
     ) external onlyOperator {
         require(!rewardPoolDistributed, "only can distribute once");
         require(_genesisPool != address(0), "!_genesisPool");
         require(_pushPool != address(0), "!_pushPool");
         require(_airdropWallet != address(0), "!_airdropWallet");
+        require(_partnerWallet != address(0), "!_partnerWallet");
         rewardPoolDistributed = true;
         _mint(_genesisPool, INITIAL_GENESIS_POOL_DISTRIBUTION);
         _mint(_pushPool, INITIAL_PUSH_POOL_DISTRIBUTION);
         _mint(_airdropWallet, INITIAL_AIRDROP_WALLET_DISTRIBUTION);
+        _mint(_partnerWallet, INITIAL_PARTNERSHIP_WALLET_DISTRIBUTION);
     }
 
     function governanceRecoverUnsupported(
