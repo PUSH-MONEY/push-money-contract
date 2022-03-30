@@ -615,7 +615,7 @@ contract PushGenesisRewardPool {
     uint256 public poolEndTime;
 
     // MAINNET
-    uint256 public pushPerSecond = 0.06365 ether; // 11000 PUSH / (24h * 60min * 60s)
+    uint256 public pushPerSecond = 0.06365 ether; // 11000 PUSH / (2 days * 24h * 60min * 60s)
     uint256 public runningTime = 2 days; // 2 days
     uint256 public constant TOTAL_REWARDS = 11000 ether;
     // END MAINNET
